@@ -1,5 +1,5 @@
 from pathlib import Path
-from dotenv import load_doenv
+from dotenv import load_dotenv
 from os import getenv, path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -7,10 +7,10 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 
 APPS_DIR = BASE_DIR / "core_apps"
 
-local_env = path.join(BASE_DIR, ".envs", "env.local")
+local_env = path.join(BASE_DIR, ".env")
 
 if path.isfile(local_env):
-    load_doenv(local_env)
+    load_dotenv(local_env)
 
 
 # Application definition

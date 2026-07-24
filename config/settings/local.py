@@ -1,12 +1,12 @@
 from os import getenv, path
-from dotenv import load_doenv
+from dotenv import load_dotenv
 from .base import *  # noqa
 from .base import BASE_DIR
 
-local_env = path.join(BASE_DIR, ".envs", "env.local")
+local_env = path.join(BASE_DIR, ".env")
 
 if path.isfile(local_env):
-    load_doenv(local_env)
+    load_dotenv(local_env)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = getenv("SECRET_KEY")
