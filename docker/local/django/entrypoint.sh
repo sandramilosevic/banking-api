@@ -24,8 +24,11 @@ while True:
     except pycopg2.OperationError as error:
         sys.stderr.write("Waiting for PostgreSQL to become available..\n")
         if time.time() - start > suggest_unrecoveravle_after:
-            sys.stderr.write("This is taking longer than excepted. The following exception may be indicative of an unrecoverable error: '{}'\n".format(error))
-            time.sleep(3)
+            sys.stderr.write(
+                "This is taking longer than excepted. The following exception may be "
+                "indicative of an unrecoverable error: '{}'\n".format(error)
+                )
+        time.sleep(3)
 
 END
 
