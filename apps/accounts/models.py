@@ -82,3 +82,54 @@ class User(AbstractUser):
             self.otp_expiry_time = None
             self.save()
         return False
+
+    def handle_failed_login_attempts(self) -> None:
+        self.failed_login_attempts += 1
+        self.last_failed_login = timezone.now()
+        if self.failed_login_attempts >= settings.LOGIN_ATTEMPTS:
+            self.account_status = self.AccountStatus.LOCKED
+            self.save()
+            send_account_locked_email(self)
+        self.save()
+
+    def reset_failed_login_attempts(self) -> None:
+        self.failed_login_attempts = 0
+        self.last_failed_login = 0
+        self.account_status = self.AccountStatus.ACTIVE
+        self.save()
+
+    def unlock_account(self) -> None:
+        if self.account_status == self.AccountStatus.LOCKED:
+            self.account_status = self.AccountStatus.ACTIVE
+            self.failed_login_attempts = 0
+            self.last_failed_login = None
+            self.save()
+
+    @property
+    def is_locked(self) -> bool:
+        if self.account_status == self.AccountStatus.LOCKED:
+            if (
+                self.last_failed_login
+                and (timezone.now() - self.last_failed_login)
+                > settings.LOCKOUT_DURATION
+            ):
+                self.unlock_account()
+                return False
+            return True
+        return False
+
+    @property
+    def full_name(self) -> str:
+        self.full_name = f"{self.first_name} {self.last_name}"
+        return self.full_name.title().strip()
+
+    class Meta:
+        verbose_name = _("User")
+        verbose_name_plural = _("Users")
+        ordering = ["-date_joined"]
+
+    def has_role(self, role_name: str) -> bool:
+        return hasattr(self, "role") and self.role == role_name
+
+    def __str__(self):
+        return f"{self.full_name} - {self.get_role_display()}"

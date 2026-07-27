@@ -139,6 +139,7 @@ STATIC_ROOT = str(BASE_DIR / "staticfiles")
 
 # Default primaru key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+AUTH_USER_MODEL = "user_app.User"
 
 LOGGING_CONFIG = None
 
