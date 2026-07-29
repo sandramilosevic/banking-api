@@ -38,7 +38,7 @@ def send_account_locked_email(self):
         "site_name": settings.SITE_NAME,
     }
     html_email = render_to_string("emails/account_locked.html".context)
-    plain_email = strinp_tags(html_email)
+    plain_email = strip_tags(html_email)
     email = EmailMultiAlternatives(subject, plain_email, from_email, recipient_list)
     email.attach_alternative(html_email, "text/html")
 
