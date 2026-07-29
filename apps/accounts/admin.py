@@ -26,7 +26,7 @@ class CustomerUserAdmin(UserAdmin):
             {
                 "fields": (
                     "username",
-                    "emails",
+                    "email",
                     "password",
                 )
             },
@@ -45,4 +45,25 @@ class CustomerUserAdmin(UserAdmin):
                 )
             },
         ),
+        (
+            _("Security"),
+            {"fields": ("security_question", "security_answer")},
+        ),
+        (
+            _("Permissions and Groups"),
+            {
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                )
+            },
+        ),
+        (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
+
+    search_fields = ["email", "username", "first_name", "last_name"]
+
+    ordering = ["email"]

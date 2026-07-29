@@ -7,7 +7,7 @@ from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 
-APPS_DIR = BASE_DIR / "core_apps"
+APPS_DIR = BASE_DIR / "apps"
 
 local_env = path.join(BASE_DIR, ".env")
 
@@ -40,7 +40,9 @@ THIRD_PARTY_APPS = [
     "django_celery_beat",
 ]
 
-LOCAL_APPS = []
+LOCAL_APPS = [
+    "apps.accounts",
+]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -139,7 +141,20 @@ STATIC_ROOT = str(BASE_DIR / "staticfiles")
 
 # Default primaru key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-AUTH_USER_MODEL = "user_app.User"
+AUTH_USER_MODEL = "accounts.User"
+
+# REST framework settings
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Horizon Bank",
+    "DESCRIPTION": "An API built for a banking system",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "LICENSE": {"name": "MIT License", "url": "https://opensource.org/license/mit"},
+}
 
 LOGGING_CONFIG = None
 

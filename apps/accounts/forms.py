@@ -10,7 +10,7 @@ class UserCreationForm(DjangoUserCreationForm):
     class Meta:
         model = User
         fields = [
-            "emial",
+            "email",
             "id_no",
             "first_name",
             "last_name",
