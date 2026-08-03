@@ -50,7 +50,6 @@ services:
     networks:
       - banker_local_nw
 
-
   redis:
     image: redis:7.0-alpine3.19
     command: redis-server --appendonly yes
@@ -61,21 +60,20 @@ services:
     image: rabbitmq:3-management
     ports:
       - "5672:5672"
+      - "15672:15672"
     networks:
       - banker_local_nw
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
       - rabbitmq_log:/var/log/rabbitmq
-    networks:
-      - banker_local_nw
-  
+
   celeryworker:
     <<: *api
-    command: /start-celeryworker.sh
-  
+    command: /start-celery-worker.sh
+
   flower:
     <<: *api
-    command: /start-flower.sh
+    command: /start-celery-flower.sh
     ports:
       - "5555:5555"
     volumes:
@@ -85,7 +83,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/local/django/Dockerfile
-    command: /start-celerybeat.sh
+    command: /start-celery-beat.sh
     env_file:
       - .env
     depends_on:
@@ -94,7 +92,6 @@ services:
       - rabbitmq
     networks:
       - banker_local_nw
-
 
   nginx:
     build:
