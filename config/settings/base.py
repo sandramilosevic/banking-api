@@ -2,7 +2,7 @@
 from dotenv import load_dotenv
 from os import getenv, path
 from loguru import logger
-from datetime import timedelta
+from datetime import timedelta, date
 import cloudinary
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -141,9 +141,17 @@ SITE_ID = 1
 STATIC_URL = "/static/"
 STATIC_ROOT = str(BASE_DIR / "staticfiles")
 
-# Default primaru key field type
+# Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "accounts.User"
+
+# Default values for user model fields
+DEFAULT_BIRTH_DATE = date(2000, 1, 1)
+DEFAULT_DATE = date(2000, 1, 1)
+DEFAULT_EXPIRY_DATE = date(2026, 1, 1)
+DEFAULT_COUNTRY = "US"
+DEFAULT_NUMBER = "+1234567890"
+
 
 # REST framework settings
 REST_FRAMEWORK = {
@@ -158,7 +166,12 @@ SPECTACULAR_SETTINGS = {
     "LICENSE": {"name": "MIT License", "url": "https://opensource.org/license/mit"},
 }
 
+# Celery settings
+
 if USE_TZ:
+    """
+    If USE_TZ is True, Celery will use the timezone defined in the TIME_ZONE setting. If USE_TZ is False, Celery will use the system's local timezone.
+    """
     CELERY_TIMEZONE = TIME_ZONE
 
 CELERY_BROKER_URL = getenv("CELERY_BROKER_URL")
@@ -175,6 +188,7 @@ CELERY_TASK_SOFT_TIME_LIMIT = 60  # 1 minute
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 CELERY_WORKER_SEND_TASK_EVENTS = True
 
+# Cloudinary settings
 CLOUDINARY_CLOUD_NAME = getenv("CLOUDINARY_CLOUD_NAME")
 CLOUDINARY_API_KEY = getenv("CLOUDINARY_API_KEY")
 CLOUDINARY_API_SECRET = getenv("CLOUDINARY_API_SECRET")
@@ -185,6 +199,8 @@ cloudinary.config(
     api_secret=CLOUDINARY_API_SECRET,
     secure=True,
 )
+
+# Logging configuration
 
 LOGGING_CONFIG = None
 
