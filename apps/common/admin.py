@@ -1,6 +1,7 @@
-from django.contrib import admin
 from typing import Any
-from django.contrib.admin import GenericTabularInline
+
+from django.contrib import admin
+from django.contrib.contenttypes.admin import GenericTabularInline
 from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
@@ -16,13 +17,12 @@ class ContentViewAdmin(admin.ModelAdmin):
         "content_type",
         "user",
         "viewer_ip",
-        "last_viewed_at",
         "created_at",
     ]
 
-    list_filter = ["content_type", "last_viewed_at", "created_at"]
+    list_filter = ["content_type", "created_at"]
 
-    date_hierarchy = "last_viewed_at"
+    date_hierarchy = "created_at"
 
     readonly_fields = [
         "content_type",
@@ -36,7 +36,7 @@ class ContentViewAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {"fields": ("content_type", "object_id", "content_object")}),
-        (_("Viewer Details"), {"fields": ("user", "viewer_ip", "last_viewed_at")}),
+        (_("Viewer Details"), {"fields": ("user", "viewer_ip")}),
         (
             _("Timestamps"),
             {"fields": ("created_at", "updated_at"), "classes": ("collapse",)},
@@ -51,16 +51,20 @@ class ContentViewAdmin(admin.ModelAdmin):
         """Disable the ability to change existing ContentView instances via the admin."""
         return False
 
+    def has_delete_permission(self, request: HttpRequest, obj: Any = None) -> bool:
+        """Disable the ability to delete ContentView instances via the admin."""
+        return False
+
 
 class ContentViewInline(GenericTabularInline):
     """Inline admin interface for displaying ContentView instances related to a specific content object."""
 
     model = ContentView
     extra = 0
+
     readonly_fields = [
         "user",
         "viewer_ip",
-        "last_viewed_at",
         "created_at",
         "updated_at",
     ]
@@ -73,4 +77,8 @@ class ContentViewInline(GenericTabularInline):
 
     def has_change_permission(self, request: HttpRequest, obj: Any = None) -> bool:
         """Disable the ability to change existing ContentView instances via the inline."""
+        return False
+
+    def has_delete_permission(self, request: HttpRequest, obj: Any = None) -> bool:
+        """Disable the ability to delete ContentView instances via the inline."""
         return False
