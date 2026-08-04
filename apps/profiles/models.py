@@ -185,3 +185,78 @@ class Profile(TimeStampModel):
 
     def __str__(self) -> str:
         return f"{self.title} {self.user.first_name}'s Profile"
+
+
+class NextOfKin(TimeStampModel):
+    """Emergency/contact person designated by a user's Profile, used to
+    reach a family member or other trusted contact when the bank
+    cannot reach the account holder directly. A profile may have
+    multiple next of kin, but only one may be marked as primary
+    (enforced via the unique constraint in Meta below).
+    """
+
+    class Salutation(models.TextChoices):
+        """Salutation choices for the NextOfKin model."""
+
+        MR = "Mr", _("Mr")
+        MRS = "Mrs", _("Mrs")
+        MS = "Ms", _("Ms")
+        DR = "Dr", _("Dr")
+        PROF = "Prof", _("Prof")
+
+    class Gender(models.TextChoices):
+        """Gender choices for the NextOfKin model."""
+
+        MALE = ("male", _("Male"))
+        FEMALE = ("female", _("Female"))
+        NON_BINARY = ("non-binary", _("Non-binary"))
+        OTHER = ("other", _("Other"))
+
+    profile = models.ForeignKey(
+        Profile, on_delete=models.CASCADE, related_name="next_of_kin"
+    )
+    title = models.CharField(
+        _("Salutation"), max_length=5, choices=Salutation.choices, default=Salutation.MR
+    )
+    first_name = models.CharField(_("First Name"), max_length=50)
+    last_name = models.CharField(_("Last Name"), max_length=50)
+    other_names = models.CharField(
+        _("Other Names"), max_length=50, blank=True, null=True
+    )
+    date_of_birth = models.DateField(_("Date of Birth"))
+    gender = models.CharField(_("Gender"), max_length=8, choices=Gender.choices)
+    relationship = models.CharField(_("Relationship"), max_length=50)
+    email_address = models.EmailField(_("Email Address"), db_index=True)
+    phone_number = PhoneNumberField(_("Phone Number"))
+    address = models.CharField(_("Address"), max_length=100)
+    city = models.CharField(
+        _("City"),
+        max_length=50,
+    )
+    country = CountryField(_("Country"))
+    is_primary = models.BooleanField(_("Is primary next of kin"), default=False)
+
+    def clean(self) -> None:
+        super().clean()
+        if self.is_primary:
+            primary_kin = NextOfKin.objects.filter(
+                profile=self.profile, is_primary=True
+            ).exclude(pk=self.pk)
+            if self.primary_kin.exists():
+                raise ValidationError(_("There can be only one primary next of kin."))
+
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return f"{self.first_name} {self.last_name} - Next of Kin for {self.profile.user.full_name}"
+
+    class Meta:
+        constrains = [
+            models.UniqueConstraint(
+                fields=["profile", "is_primary"],
+                condition=models.Q(is_primary=True),
+                name="unique_primary_next_of_kin",
+            )
+        ]
